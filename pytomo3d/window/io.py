@@ -92,11 +92,6 @@ def get_json_content(window, with_phase=False):
         if k in window.__dict__:
             info[k] = window.__dict__[k]
 
-    #if "channel_id_2" in dir(window):
-    #    info["channel_id_2"] = window.channel_id_2
-    #if "distance_in_km" in dir(window):
-    #    info["distance_in_km"] = window.distance_in_km
-
     return info
 
 

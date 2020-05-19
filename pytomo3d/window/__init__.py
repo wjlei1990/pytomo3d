@@ -13,8 +13,8 @@ import logging
 
 # Setup the logger.
 logger = logging.getLogger("pytomo3d.window")
-#logger.setLevel(logging.WARNING)
-logger.setLevel(logging.DEBUG)
+#logger.setLevel(logging.WARNING)      # NOQA
+logger.setLevel(logging.DEBUG)         # NOQA
 # Prevent propagating to higher loggers.
 logger.propagate = 0
 # Console log handler.
