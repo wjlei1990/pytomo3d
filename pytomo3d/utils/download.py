@@ -30,10 +30,12 @@ def _parse_station_id(station_id):
         comp = "*"
     elif len(content) == 4:
         nw, sta, loc, comp = content
+    else:
+        raise ValueError("Can't not parse station_id: %s" % station_id)
     return nw, sta, loc, comp
 
 
-def download_waveform(stations, starttime, endtime, outputdir=".",
+def download_waveform(stations, starttime, endtime, outputdir=None,
                       client=None):
     """
     download wavefrom data from IRIS data center
@@ -54,32 +56,35 @@ def download_waveform(stations, starttime, endtime, outputdir=".",
 
     _status = {}
     for station_id in stations:
+        error_code = "None"
         network, station, location, channel = _parse_station_id(station_id)
 
-        filename = os.path.join(outputdir, "%s.mseed" % station_id)
-        if os.path.exists(filename):
-            os.remove(filename)
+        if outputdir is not None:
+            filename = os.path.join(outputdir, "%s.mseed" % station_id)
+            if os.path.exists(filename):
+                os.remove(filename)
+        else:
+            filename = None
 
         try:
             st = client.get_waveforms(
                 network=network, station=station, location=location,
                 channel=channel, starttime=starttime, endtime=endtime)
-            if len(st) > 0:
+            if len(st) == 0:
+                error_code = "stream empty"
+            if filename is not None and len(st) > 0:
                 st.write(filename, format="MSEED")
-                error_code = 0
-            else:
-                error_code = 1
         except Exception as e:
-            print("Failed to download waveform '%s' due to: %s"
-                  % (station_id, str(e)))
-            error_code = 2
+            error_code = "Failed to download waveform '%s' due to: %s" \
+                % (station_id, str(e))
+            print(error_code)
 
         _status[station_id] = error_code
 
-    return _status
+    return {"stream": st, "status": _status}
 
 
-def download_stationxml(stations, starttime, endtime, outputdir=".",
+def download_stationxml(stations, starttime, endtime, outputdir=None,
                         client=None, level="response"):
 
     if client is None:
@@ -94,26 +99,30 @@ def download_stationxml(stations, starttime, endtime, outputdir=".",
 
     _status = {}
     for station_id in stations:
+        error_code = "None"
         network, station, location, channel = _parse_station_id(station_id)
 
-        filename = os.path.join(outputdir, "%s.xml" % station_id)
-        if os.path.exists(filename):
-            os.remove(filename)
+        if outputdir is not None:
+            filename = os.path.join(outputdir, "%s.xml" % station_id)
+            if os.path.exists(filename):
+                os.remove(filename)
+        else:
+            filename = None
 
         try:
             inv = client.get_stations(
                 network=network, station=station, location=location,
                 channel=channel, starttime=starttime, endtime=endtime,
                 level=level)
-            if len(inv) > 0:
+            if len(inv) == 0:
+                error_code = "Inventory Empty"
+            if filename is not None and len(inv) > 0:
                 inv.write(filename, format="STATIONXML")
-                error_code = 0
-            else:
-                error_code = 1
         except Exception as e:
-            print("Failed to download StationXML '%s' due to: %s"
-                  % (station_id, str(e)))
-            error_code = 2
+            error_code = "Failed to download StationXML '%s' due to: %s" \
+                % (station_id, str(e))
+            print(error_code)
+
         _status[station_id] = error_code
 
-    return _status
+    return {"inventory": inv, "status": _status}

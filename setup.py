@@ -48,7 +48,7 @@ setup(
         "seismology", "tomography", "adjoint", "signal", "inversion", "window"
     ],
     install_requires=[
-        "numpy", "obspy>=1.0.0", "flake8>=3.0", "pytest", "nose",
+        "numpy", "obspy==1.0.3", "flake8>=3.0", "pytest", "nose",
         "future>=0.14.1", "pyflex", "pyadjoint", "geographiclib"
     ],
     extras_require={
