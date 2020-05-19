@@ -11,7 +11,7 @@ Methods that handles signal data processing for stream(Obspy.Stream)
 """
 
 from __future__ import (division, print_function, absolute_import)
-from obspy.signal.invsim import c_sac_taper
+from obspy.signal.invsim import cosine_sac_taper
 from obspy.signal.util import _npts2nfft
 from obspy import Stream, Trace
 import numpy as np
@@ -131,7 +131,7 @@ def filter_trace(tr, pre_filt):
 
     # Transform data to Frequency domain
     data = np.fft.rfft(data, n=nfft)
-    data *= c_sac_taper(freqs, flimit=pre_filt)
+    data *= cosine_sac_taper(freqs, flimit=pre_filt)
     data[-1] = abs(data[-1]) + 0.0j
     # transform data back into the time domain
     data = np.fft.irfft(data)[0:origin_len]

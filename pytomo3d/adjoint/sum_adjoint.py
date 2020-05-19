@@ -38,9 +38,9 @@ def check_adj_consistency(adj_base, adj):
                          % (adj_base.dt, adj.dt))
 
     if np.abs(adj_base.starttime - adj.starttime) > 0.5 * adj.dt:
-        raise ValueError("Start time of current adjoint source(%s)"
-                         "and new added adj(%s) not the same"
-                         % (adj_base.dt, adj.dt))
+        raise ValueError("Start time of current adjoint source({})"
+                         "and new added adj({}) not the same (dt: {})".format(
+                            adj_base.starttime, adj.starttime, adj.dt))
 
     if len(adj_base.adjoint_source) != len(adj.adjoint_source):
         raise ValueError("Dimension of current adjoint_source(%d)"
@@ -53,11 +53,11 @@ def check_events_consistent(events):
     """
     Check all events are consistent(same with each other)
     """
-    fn_base = events.keys()[0]
+    fn_base = list(events.keys())[0]
     event_base = events[fn_base]
 
     diffs = []
-    for asdf_fn, event in events.iteritems():
+    for asdf_fn, event in events.items():
         if event_base != event:
             diffs.append(asdf_fn)
 
@@ -191,7 +191,7 @@ def rotate_adjoint_sources(old_adjs, stations, event_latitude,
     done_sta_list = []
     new_adjs = {}
 
-    for adj_id, adj in old_adjs.iteritems():
+    for adj_id, adj in old_adjs.items():
         network = adj.network
         station = adj.station
         sta_tag = "%s_%s" % (network, station)

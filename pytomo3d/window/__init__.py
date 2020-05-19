@@ -9,5 +9,19 @@
 """
 
 from __future__ import (absolute_import, division, print_function)
+import logging
 
-from .window import window_on_stream, window_on_trace  # NOQA
+# Setup the logger.
+logger = logging.getLogger("pytomo3d.window")
+#logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
+# Prevent propagating to higher loggers.
+logger.propagate = 0
+# Console log handler.
+ch = logging.StreamHandler()
+# Add formatter
+FORMAT = "[%(asctime)s] - %(name)s - %(levelname)s " + \
+    "[%(filename)s:%(lineno)d]: %(message)s"
+formatter = logging.Formatter(FORMAT)
+ch.setFormatter(formatter)
+logger.addHandler(ch)

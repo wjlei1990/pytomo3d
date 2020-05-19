@@ -57,7 +57,7 @@ def _stats_channel_window(adjsrcs, windows):
         adj_dict[adj_id] = idx
 
     adj_win_dict = {}
-    for chan_win in windows.itervalues():
+    for chan_win in windows.values():
         if len(chan_win) == 0:
             continue
         chan_id = chan_win[0]["channel_id"]
@@ -83,17 +83,17 @@ def calculate_chan_weight(adjsrcs, windows_sta):
     _, adj_win_dict = _stats_channel_window(adjsrcs, windows_sta)
 
     comp_dict = {}
-    for tr_id, nwins in adj_win_dict.iteritems():
+    for tr_id, nwins in adj_win_dict.items():
         comp = "MX%s" % tr_id.split(".")[-1][-1]
         if comp not in comp_dict:
             comp_dict[comp] = {}
         comp_dict[comp][tr_id] = nwins
 
-    for comp, comp_wins in comp_dict.iteritems():
+    for comp, comp_wins in comp_dict.items():
         ntotal = 0
-        for chan_id, chan_win in comp_wins.iteritems():
+        for chan_id, chan_win in comp_wins.items():
             ntotal += chan_win
-        for chan_id, chan_win in comp_wins.iteritems():
+        for chan_id, chan_win in comp_wins.items():
             comp_dict[comp][chan_id] = chan_win / ntotal
 
     return comp_dict
@@ -127,7 +127,7 @@ def check_multiple_instruments(adjsrcs):
                          % (adj.network, adj.station, name_list))
 
     _flag = False
-    for cat_info in adj_dict.itervalues():
+    for cat_info in adj_dict.values():
         if len(cat_info) > 1:
             _flag = True
             break

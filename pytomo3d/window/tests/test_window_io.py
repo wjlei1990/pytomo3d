@@ -1,6 +1,6 @@
 import os
 import inspect
-from obspy import read, read_inventory, readEvents
+from obspy import read, read_inventory, read_events
 import pyflex
 import pytomo3d.window.window as win
 import pytomo3d.window.io as wio
@@ -18,7 +18,7 @@ def _upper_level(path, nlevel=4):
 # Most generic way to get the data folder path.
 TESTBASE_DIR = _upper_level(
     os.path.abspath(inspect.getfile(inspect.currentframe())), 4)
-print TESTBASE_DIR
+print(TESTBASE_DIR)
 DATA_DIR = os.path.join(TESTBASE_DIR, "tests", "data")
 
 obsfile = os.path.join(DATA_DIR, "proc", "IU.KBL.obs.proc.mseed")
@@ -47,7 +47,7 @@ class TestWrite:
             DATA_DIR, "window", "27_60.BHZ.config.yaml")
         config = wio.load_window_config_yaml(config_file)
 
-        cat = readEvents(quakeml)
+        cat = read_events(quakeml)
 
         inv = read_inventory(staxml)
         windows = win.window_on_trace(obs_tr, syn_tr, config, station=inv,

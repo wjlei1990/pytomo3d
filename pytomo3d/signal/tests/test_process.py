@@ -129,7 +129,7 @@ def test_process_obsd():
 
     st = testobs.copy()
     inv = deepcopy(teststaxml)
-    event = obspy.readEvents(testquakeml)[0]
+    event = obspy.read_events(testquakeml)[0]
     origin = event.preferred_origin() or event.origins[0]
     event_lat = origin.latitude
     event_lon = origin.longitude
@@ -154,7 +154,7 @@ def test_process_obsd():
 def test_process_obsd_2():
     st = testobs.copy()
     inv = deepcopy(teststaxml)
-    event = obspy.readEvents(testquakeml)[0]
+    event = obspy.read_events(testquakeml)[0]
     origin = event.preferred_origin() or event.origins[0]
     event_lat = origin.latitude
     event_lon = origin.longitude
@@ -184,7 +184,7 @@ def test_process_synt():
     inv = obspy.read_inventory(staxmlfile)
 
     st = testsyn.copy()
-    event = obspy.readEvents(testquakeml)[0]
+    event = obspy.read_events(testquakeml)[0]
     origin = event.preferred_origin() or event.origins[0]
     event_lat = origin.latitude
     event_lon = origin.longitude

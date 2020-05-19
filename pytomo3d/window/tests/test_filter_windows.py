@@ -471,7 +471,7 @@ def test_check_consistency():
     with pytest.raises(KeyError) as errmsg:
         fw.check_consistency(windows, _measures)
 
-    assert "Missing" in str(errmsg)
+    assert "Missing" in str(errmsg.value)
 
 
 def test_filter_windows():

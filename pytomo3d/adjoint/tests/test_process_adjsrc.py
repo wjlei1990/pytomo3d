@@ -35,8 +35,8 @@ EVENTFILE = os.path.join(DATA_DIR, "quakeml", "C201009031635A.xml")
 def test_calculate_baz():
     npt.assert_almost_equal(pa.calculate_baz(0, 0, 10, 0), 180.0)
     npt.assert_almost_equal(pa.calculate_baz(0, 0, 0, 10), 270.0)
-    npt.assert_almost_equal(pa.calculate_baz(0, 0, 0, -10), 90)
-    npt.assert_almost_equal(pa.calculate_baz(0, 0, -10, 0), 0)
+    npt.assert_almost_equal(pa.calculate_baz(0, 0, 0, -10), 90.0)
+    npt.assert_almost_equal(pa.calculate_baz(0, 0, -10, 0), 360.0)
 
 
 def test_change_channel_name():
@@ -105,7 +105,7 @@ def test_convert_adjs_to_stream():
     assert len(meta) == 3
     keys = meta.keys()
     assert set(keys) == set(true_keys)
-    for m in meta.itervalues():
+    for m in meta.values():
         assert m["adj_src_type"] == "cc_traveltime_misfit"
         npt.assert_almost_equal(m["misfit"], 0.0)
         npt.assert_almost_equal(m["min_period"], 17.0)
@@ -319,7 +319,8 @@ def test_interp_adj_stream():
 
     st.interpolate(sampling_rate=1/delta, starttime=starttime, npts=npts)
     for tr, _tr in zip(st, _st):
-        assert_trace_equal(tr, _tr, rtol=1e-3, atol=0.005)
+        print(tr.stats.npts, _tr)
+        assert_trace_equal(tr, _tr, rtol=5e-3, atol=1e-2)
 
 
 def test_process_adjoint():

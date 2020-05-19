@@ -29,14 +29,12 @@ synfile = os.path.join(DATA_DIR, "proc", "IU.KBL.syn.proc.mseed")
 winfile = os.path.join(DATA_DIR, "window", "IU.KBL..BHR.window.json")
 
 
-@pytest.fixture
 def load_config_multitaper():
     config_file = os.path.join(DATA_DIR, "adjoint",
                                "multitaper.adjoint.config.yaml")
     return adj_io.load_adjoint_config_yaml(config_file)
 
 
-@pytest.fixture
 def setup_calculate_adjsrc_on_trace_args():
     obs = read(obsfile).select(channel="*R")[0]
     syn = read(synfile).select(channel="*R")[0]
@@ -125,7 +123,6 @@ def test_calculate_adjsrc_on_trace_multitaper_misfit_produces_adjsrc():
 #    assert adjsrc
 
 
-@pytest.fixture
 def setup_calculate_adjsrc_on_stream_args():
     obs = Stream(traces=[read(obsfile).select(channel="*R")[0]])
     syn = Stream(traces=[read(synfile).select(channel="*R")[0]])

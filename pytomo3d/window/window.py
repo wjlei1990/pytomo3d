@@ -10,14 +10,15 @@ Methods that handles Window selection
     (http://www.gnu.org/licenses/lgpl-3.0.en.html)
 """
 import os
-import pyflex
-import obspy
+import numpy as np
 import copy
 import importlib
+import obspy
+import pyflex
+from . import logger
 
 
-def plot_window_figure(figure_dir, figure_id, ws, _verbose=False,
-                       figure_format="pdf"):
+def plot_window_figure(figure_dir, figure_id, ws, figure_format="pdf"):
     """
     Plot window figure out
 
@@ -28,16 +29,13 @@ def plot_window_figure(figure_dir, figure_id, ws, _verbose=False,
     :type figure_id: str
     :param ws: window selector object from pyflex
     :type ws: pyflex.WindowSelector
-    :param _verbose: verbose output flag
-    :type _verbose: bool
     :param figure_format: figure format, could be "pdf", "png" and etc.
     :type figure_format: str
     :return:
     """
     outfn = "%s.%s" % (figure_id, figure_format)
     figfn = os.path.join(figure_dir, outfn)
-    if _verbose:
-        print "Output window figure:", figfn
+    logger.info("Output window figure: {}".format(figfn))
     ws.plot(figfn)
 
 
@@ -111,8 +109,110 @@ def update_user_levels(user_module, config, station, event, obsd, synt):
     return new_config
 
 
+def get_station_location(station, net, sta):
+    inv = station.select(network=net, station=sta)
+    try:
+        lat = inv[0][0].latitude
+        lon = inv[0][0].longitude
+    except Exception as exp:
+        raise ValueError("failed to get location info from station "
+                         "due to: {}".format(exp))
+
+    return lat, lon
+
+
+def get_station_event_distance(obs_tr, stationxml, event):
+    net = obs_tr.stats.network
+    sta = obs_tr.stats.station
+
+    try:
+        inv = stationxml.select(network=net, station=sta)[0][0]
+        sta_lat, sta_lon = inv.latitude, inv.longitude
+    except Exception as exp:
+        raise ValueError("Failed to get station location {}.{} "
+                         "due to: {}".format(net, sta, exp))
+
+    try:
+        origin = event.preferred_origin()
+        ev_lat, ev_lon = origin.latitude, origin.longitude
+    except Exception as exp:
+        raise ValueError("Failed to get event location "
+                         "due to: {}".format(exp))
+
+    dist_in_deg = obspy.geodetics.locations2degrees(
+        ev_lat, ev_lon, sta_lat, sta_lon)
+    dist_in_km = obspy.geodetics.degrees2kilometers(dist_in_deg)
+
+    return dist_in_deg, dist_in_km
+
+
+def set_config_for_body_and_mantle_waves(
+        config, event, station, obs_tr):
+    """
+    Set configs for body and mantle wave window picking.
+    1) raise the threshold between surface wave arrival and end
+    2) lower the threshold for mantle wave(after surface wave)
+    """
+    logger.info("set config for mode: body_and_mantle_waves")
+    _, dist_in_km = get_station_event_distance(obs_tr, station, event)
+
+    surface_arrival = dist_in_km / config.max_surface_wave_velocity
+    surface_end = dist_in_km / config.min_surface_wave_velocity
+
+    srate = obs_tr.stats.sampling_rate
+    origin = event.preferred_origin()
+    offset = origin.time - obs_tr.stats.starttime
+
+    idx_sa = int((surface_arrival + offset) * srate)
+    idx_se = int((surface_end + offset) * srate)
+
+    npts = obs_tr.stats.npts
+    # get values
+    tshifts = config.tshift_acceptance_level * np.ones(npts)
+    dlnas = config.dlna_acceptance_level * np.ones(npts)
+    ccs = config.cc_acceptance_level * np.ones(npts)
+    s2ns = config.s2n_limit * np.ones(npts)
+
+    logger.debug("Setting up criteria arrays in config")
+    logger.debug("surface wave index: {}, {}".format(idx_sa, idx_se))
+    # 1. Leave the first arrival --> surface arrival unchanged
+    # 2. Set surface arrival --> surface end to higher criteria
+    tshifts[idx_sa:(idx_se)] /= 2
+    dlnas[idx_sa:(idx_se)] /= 2
+    ccs[idx_sa:(idx_se)] += 0.10
+    s2ns[idx_sa:(idx_se)] *= 2.0
+
+    # 3. Set surface end --> npts to lower criteria to pick ScS
+    #   and its multiples
+    tshifts[idx_se:] *= 1.0
+    dlnas[idx_se:] = 1.0
+    ccs[idx_se:] -= 0.05
+    s2ns[idx_se:] *= 0.75
+
+    # clip the values
+    ccs = np.clip(ccs, np.min(ccs), 0.99)
+    s2ns = np.clip(s2ns, 2.0, np.max(s2ns))
+
+    # set values
+    config.tshift_acceptance_level = tshifts
+    config.dlna_acceptance_level = dlnas
+    config.cc_acceptance_level = ccs
+    config.s2n_limit = s2ns
+
+    return config
+
+
+def set_config_for_selection_mode(config, station, event, obs_tr):
+    selection_mode = config.selection_mode
+    if selection_mode == "body_and_mantle_waves":
+        config = set_config_for_body_and_mantle_waves(
+            config, event, station, obs_tr)
+
+    return config
+
+
 def window_on_trace(obs_tr, syn_tr, config, station=None,
-                    event=None, user_module=None, _verbose=False,
+                    event=None, user_module=None,
                     figure_mode=False, figure_dir=None,
                     figure_format="pdf"):
     """
@@ -135,8 +235,6 @@ def window_on_trace(obs_tr, syn_tr, config, station=None,
     :type figure_mode: bool
     :param figure_dir: output figure directory
     :type figure_dir: str
-    :param _verbose: verbose flag
-    :type _verbose: bool
     :return:
     """
 
@@ -154,28 +252,39 @@ def window_on_trace(obs_tr, syn_tr, config, station=None,
         config = update_user_levels(user_module, config, station,
                                     event, obs_tr, syn_tr)
 
+    config = set_config_for_selection_mode(config, station, event, obs_tr)
+    logger.debug("unique values in config.tshift_acceptance_level: "
+                 "{}".format(np.unique(config.tshift_acceptance_level)))
+    logger.debug("unique values in config.dlna_acceptance_level: "
+                 "{}".format(np.unique(config.dlna_acceptance_level)))
+    logger.debug("unique values in config.cc_acceptance_level: "
+                 "{}".format(np.unique(config.cc_acceptance_level)))
+    logger.debug("unique values in config.s2n_limit: "
+                 "{}".format(np.unique(config.s2n_limit)))
+
+    # set the signal_end_index to trace npts
+    config.signal_end_index = obs_tr.stats.npts
+
     ws = pyflex.WindowSelector(obs_tr, syn_tr, config,
                                event=event, station=station)
     try:
         windows = ws.select_windows()
     except Exception as err:
-        print("Error(%s): %s" % (obs_tr.id, err))
+        logger.warning("Error(%s): %s" % (obs_tr.id, err))
         windows = []
 
     if figure_mode:
-        plot_window_figure(figure_dir, obs_tr.id, ws, _verbose,
+        plot_window_figure(figure_dir, obs_tr.id, ws,
                            figure_format=figure_format)
 
-    if _verbose:
-        print("Station %s picked %i windows" % (obs_tr.id, len(windows)))
+    logger.info("Station %s picked %i windows" % (obs_tr.id, len(windows)))
 
     return windows
 
 
 def window_on_stream(observed, synthetic, config_dict, station=None,
                      event=None, user_modules=None,
-                     figure_mode=False, figure_dir=None,
-                     _verbose=False):
+                     figure_mode=False, figure_dir=None):
     """
     Window selection on a Stream
 
@@ -197,8 +306,6 @@ def window_on_stream(observed, synthetic, config_dict, station=None,
     :type figure_mode: bool
     :param figure_dir: output figure directory
     :type figure_dir: str
-    :param _verbose: verbose flag
-    :type _verbose: bool
     :return:
     """
     if not isinstance(observed, obspy.Stream):
@@ -236,14 +343,15 @@ def window_on_stream(observed, synthetic, config_dict, station=None,
                                           network=obs_tr.stats.network,
                                           component=component)[0]
             except Exception as err:
-                print("Couldn't find corresponding synt for obsd trace(%s):"
-                      "%s" % (obs_tr.id, err))
+                logger.warning(
+                    "Couldn't find corresponding synt for obsd trace(%s):"
+                    "%s" % (obs_tr.id, err))
                 continue
 
             config = copy.deepcopy(config_base)
             windows = window_on_trace(
                 obs_tr, syn_tr, config, station=station,
-                event=event, user_module=user_module, _verbose=_verbose,
+                event=event, user_module=user_module,
                 figure_mode=figure_mode, figure_dir=figure_dir)
 
             if windows is None:

@@ -393,7 +393,7 @@ def rotate_stream(st, event_latitude, event_longitude,
     # "00" and "10").
     sorted_st_dict = sort_stream_by_station(st)
 
-    for sta_stream in sorted_st_dict.itervalues():
+    for sta_stream in sorted_st_dict.values():
         # loop over stations
         nw = sta_stream[0].stats.network
         station = sta_stream[0].stats.station

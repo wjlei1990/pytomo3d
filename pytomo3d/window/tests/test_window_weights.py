@@ -98,12 +98,12 @@ def test_normalize_receiver_weights():
     rec_counts, cat_wcounts = ww.calculate_receiver_window_counts(windows)
 
     comp = "BHZ"
-    channels = rec_counts[comp].keys()
+    channels = list(rec_counts[comp].keys())
     channels.sort()
     points = ww.assign_receiver_to_points(channels, stations)
     weights = ww.normalize_receiver_weights(points, rec_counts[comp])
     assert len(weights) == 3
-    for v in weights.itervalues():
+    for v in weights.values():
         npt.assert_almost_equal(v, 1.0)
 
     points[0].weight = 0.5

@@ -16,6 +16,9 @@ from obspy.core.inventory import Channel, Station, Network, Inventory, Site
 
 
 def check_in_range(value, vranges):
+    """
+    Check values that within in the ranges
+    """
     if vranges[0] > vranges[1]:
         vmin = vranges[1]
         vmax = vranges[0]
@@ -41,7 +44,7 @@ def write_stations_file(sta_dict, filename="STATIONS"):
     """
     with open(filename, 'w') as fh:
         od = collections.OrderedDict(sorted(sta_dict.items()))
-        for _sta_id, _sta in od.iteritems():
+        for _sta_id, _sta in od.items():
             network, station = _sta_id.split(".")
             _lat = _sta[0]
             _lon = _sta[1]

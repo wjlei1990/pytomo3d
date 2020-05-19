@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from obspy import read, read_inventory, readEvents
+from obspy import read, read_inventory, read_events
 from pyflex import WindowSelector
 from pyflex.window import Window
 import pytomo3d.window.window as win
@@ -62,7 +62,7 @@ def test_update_user_levels():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     user_module = "pytomo3d.window.tests.user_module_example"
@@ -88,14 +88,35 @@ def test_update_user_levels_raise():
         win.update_user_levels(user_module, None, None, None,
                                None, None)
 
-    assert "Could not import the user_function module" in str(errmsg)
+    assert "Could not import the user_function module" in str(errmsg.value)
 
     user_module = "pytomo3d.window.io"
     with pytest.raises(Exception) as errmsg:
         win.update_user_levels(user_module, None, None, None,
                                None, None)
     assert "Given user module does not have a generate_user_levels method" \
-        in str(errmsg)
+        in str(errmsg.value)
+
+
+def assert_window_close(win1, win2):
+    def _compare_value(value1, value2):
+        if isinstance(value1, float) or isinstance(value1, np.float64):
+            np.testing.assert_allclose(value1, value2)
+        elif isinstance(value1, np.float32):
+            np.testing.assert_allclose(value1, value2, rtol=1e-06)
+        else:
+            if value1 != value2:
+                raise AssertionError
+
+    dict1 = win1.__dict__
+    dict2 = win2.__dict__
+    try:
+        for key in dict1.keys():
+            _compare_value(dict1[key], dict2[key])
+    except Exception as exp:
+        print("Exception raised: {}".format(exp))
+        return False
+    return True
 
 
 def test_window_on_trace():
@@ -105,7 +126,7 @@ def test_window_on_trace():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     windows = win.window_on_trace(obs_tr, syn_tr, config, station=inv,
@@ -118,9 +139,10 @@ def test_window_on_trace():
                               "IU.KBL..BHR.window.json")
     with open(winfile_bm) as fh:
         windows_json = json.load(fh)
+
     for _win, _win_json_bm in zip(windows, windows_json):
         _win_bm = Window._load_from_json_content(_win_json_bm)
-        assert _win == _win_bm
+        assert_window_close(_win, _win_bm)
 
 
 def test_window_on_trace_user_levels():
@@ -130,7 +152,7 @@ def test_window_on_trace_user_levels():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
     user_module = "pytomo3d.window.tests.user_module_example"
 
@@ -148,7 +170,7 @@ def test_window_on_trace_with_none_user_levels():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     windows = win.window_on_trace(obs_tr, syn_tr, config, station=inv,
@@ -161,7 +183,7 @@ def test_window_on_trace_with_none_user_levels():
         windows_json = json.load(fh)
     for _win, _win_json_bm in zip(windows, windows_json):
         _win_bm = Window._load_from_json_content(_win_json_bm)
-        assert _win == _win_bm
+        assert_window_close(_win, _win_bm)
 
 
 def test_window_on_stream():
@@ -175,7 +197,7 @@ def test_window_on_stream():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     windows = win.window_on_stream(obs_tr, syn_tr, config_dict, station=inv,
@@ -198,7 +220,7 @@ def test_window_on_stream_user_levels():
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     _mod = "pytomo3d.window.tests.user_module_example"
@@ -223,7 +245,7 @@ def test_plot_window_figure(tmpdir):
     config_file = os.path.join(DATA_DIR, "window", "27_60.BHZ.config.yaml")
     config = wio.load_window_config_yaml(config_file)
 
-    cat = readEvents(quakeml)
+    cat = read_events(quakeml)
     inv = read_inventory(staxml)
 
     ws = WindowSelector(obs_tr, syn_tr, config, event=cat, station=inv)

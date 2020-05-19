@@ -10,10 +10,10 @@ def extract_usable_stations_from_one_period(measures):
     """ Extract usable stations and channels from measurements file """
     stations = []
     channels = []
-    for sta, sta_info in measures.iteritems():
+    for sta, sta_info in measures.items():
         n_measure_sta = 0
         # append each usable channel
-        for chan, chan_info in sta_info.iteritems():
+        for chan, chan_info in sta_info.items():
             n_measure_chan = len(chan_info)
             if n_measure_chan > 0:
                 channels.append(chan)
@@ -29,7 +29,7 @@ def extract_usable_stations_from_measurements(measurements):
     stations = set()
     channels = set()
 
-    for period, measures in measurements.iteritems():
+    for period, measures in measurements.items():
         stations_one_period, channels_one_period = \
             extract_usable_stations_from_one_period(measures)
         print("[Period:%s]Number of stations and channels: %d, %d" %
@@ -81,7 +81,7 @@ def prepare_adjoint_station_information(usable_channels, stations):
                 continue
 
     adjoint_stations = {}
-    for sta_id, sta_info in adjoint_stations_info.iteritems():
+    for sta_id, sta_info in adjoint_stations_info.items():
         adjoint_stations[sta_id] = [
             sta_info["latitude"], sta_info["longitude"],
             sta_info["elevation"], sta_info["depth"]]

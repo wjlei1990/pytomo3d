@@ -35,9 +35,9 @@ def plot_adjoint_and_data(adjsrc, win_times, obs_tr, syn_tr):
     ylim = max(map(abs, plt.ylim()))
     plt.ylim(-ylim, ylim)
     for win in win_times:
-        l = win[0]
-        r = win[1]
-        re = Rectangle((l, plt.ylim()[0]), r - l,
+        left = win[0]
+        right = win[1]
+        re = Rectangle((left, plt.ylim()[0]), right - left,
                        plt.ylim()[1] - plt.ylim()[0], color="blue",
                        alpha=0.4)
         plt.gca().add_patch(re)
@@ -51,9 +51,9 @@ def plot_adjoint_and_data(adjsrc, win_times, obs_tr, syn_tr):
     ylim = max(map(abs, plt.ylim()))
     plt.ylim(-ylim, ylim)
     for win in win_times:
-        l = win[0]
-        r = win[1]
-        re = Rectangle((l, plt.ylim()[0]), r - l,
+        left = win[0]
+        right = win[1]
+        re = Rectangle((left, plt.ylim()[0]), right - left,
                        plt.ylim()[1] - plt.ylim()[0], color="blue",
                        alpha=0.4)
         plt.gca().add_patch(re)

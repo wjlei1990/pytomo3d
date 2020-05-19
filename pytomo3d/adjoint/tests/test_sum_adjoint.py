@@ -47,13 +47,14 @@ def test_check_adj_consistency():
     adj2.dt *= 2
     with pytest.raises(ValueError) as errmsg:
         sa.check_adj_consistency(adj1, adj2)
-    assert "DeltaT of current adjoint source" in str(errmsg)
+    print(str(errmsg))
+    assert "DeltaT of current adjoint source" in str(errmsg.value)
 
     adj2 = deepcopy(adj1)
     adj2.starttime += 1
     with pytest.raises(ValueError) as errmsg:
         sa.check_adj_consistency(adj1, adj2)
-    assert "Start time of current adjoint source" in str(errmsg)
+    assert "Start time of current adjoint source" in str(errmsg.value)
 
 
 def test_check_events_consistent():

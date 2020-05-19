@@ -68,7 +68,7 @@ def test_ensemble_synthetic_channel_orientation():
 
     with pytest.raises(Exception) as err:
         rotate.ensemble_synthetic_channel_orientation("MXR")
-    assert ": MXR" in str(err)
+    assert ": MXR" in str(err.value)
 
 
 def test_extract_channel_orientation():
@@ -148,14 +148,14 @@ def test_check_information_before_rotate():
     with pytest.raises(ValueError) as msg:
         rotate.check_information_before_rotation(
             tr_n_2, tr_e, inv, True)
-    assert "All components need to have" in str(msg)
+    assert "All components need to have" in str(msg.value)
 
     inv = deepcopy(teststaxml)
     inv.select(channel="BHN")[0][0][0].azimuth += 1.0
     with pytest.raises(ValueError) as msg:
         rotate.check_information_before_rotation(
             tr_n, tr_e, inv, True)
-    assert "Horizontal component" in str(msg)
+    assert "Horizontal component" in str(msg.value)
 
 
 def test_rotate_12_rt_func():

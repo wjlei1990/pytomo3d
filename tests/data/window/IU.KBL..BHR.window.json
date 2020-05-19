@@ -10,26 +10,20 @@
     "dlnA":0.48552751541137695,
     "dt":0.5,
     "left_index":1789,
-    "max_cc_value":0.8778460621833801,
+    "max_cc_value":0.87784594,
     "min_period":27.0,
     "phase_arrivals":[
       {
-        "dT/dD":4.4456692671514837,
-        "phase_name":"Pdiff",
-        "take-off angle":13.434087677707552,
-        "time":921.57164021473227
+        "time":921.57164021473227,
+        "phase_name":"Pdiff"
       },
       {
-        "dT/dD":4.4456692671514837,
-        "phase_name":"pPdiff",
-        "take-off angle":-13.434087677707552,
-        "time":925.59656472549852
+        "time":925.59656472549852,
+        "phase_name":"pPdiff"
       },
       {
-        "dT/dD":4.4456692671514837,
-        "phase_name":"sPdiff",
-        "take-off angle":-7.9665437648996926,
-        "time":927.01890281265969
+        "time":927.01890281265969,
+        "phase_name":"sPdiff"
       }
     ],
     "relative_endtime":984.0,
@@ -53,45 +47,31 @@
     "min_period":27.0,
     "phase_arrivals":[
       {
-        "dT/dD":1.9203947915200748,
         "phase_name":"PKIKP",
-        "take-off angle":5.7597903672055866,
         "time":1133.7321324662771
       },
       {
-        "dT/dD":1.9667534143239638,
         "phase_name":"PKiKP",
-        "take-off angle":5.8993201347274269,
         "time":1133.8825697541524
       },
       {
-        "dT/dD":1.9204256128819468,
         "phase_name":"pPKIKP",
-        "take-off angle":-5.7598831215868769,
         "time":1137.8492259219263
       },
       {
-        "dT/dD":1.9666201058462494,
         "phase_name":"pPKiKP",
-        "take-off angle":-5.8989188541267081,
         "time":1137.9986120246617
       },
       {
-        "dT/dD":1.920419365467769,
         "phase_name":"sPKIKP",
-        "take-off angle":-3.4323249861736018,
         "time":1139.2526820380981
       },
       {
-        "dT/dD":1.9666471316624559,
         "phase_name":"sPKiKP",
-        "take-off angle":-3.5150494831133834,
         "time":1139.4022812356418
       },
       {
-        "dT/dD":6.8044611381118356,
         "phase_name":"PP",
-        "take-off angle":20.829909599926395,
         "time":1226.4648460852875
       }
     ],
@@ -116,27 +96,19 @@
     "min_period":27.0,
     "phase_arrivals":[
       {
-        "dT/dD":6.4899426478691424,
         "phase_name":"SKKS",
-        "take-off angle":11.672984879522478,
         "time":1645.8188901670642
       },
       {
-        "dT/dD":8.3405984429746454,
         "phase_name":"Sdiff",
-        "take-off angle":15.071261840889404,
         "time":1700.6517202757764
       },
       {
-        "dT/dD":8.3405984429746454,
         "phase_name":"pSdiff",
-        "take-off angle":-25.840796286684665,
         "time":1705.8633598019533
       },
       {
-        "dT/dD":8.3405984429746454,
         "phase_name":"sSdiff",
-        "take-off angle":-15.071261840889404,
         "time":1707.3500031243075
       }
     ],
@@ -161,27 +133,19 @@
     "min_period":27.0,
     "phase_arrivals":[
       {
-        "dT/dD":2.9610305040872409,
         "phase_name":"SKKS",
-        "take-off angle":5.2965630710429092,
         "time":2185.9236772240752
       },
       {
-        "dT/dD":1.873485479005921,
         "phase_name":"SKIKKIKS",
-        "take-off angle":3.3483442154348597,
         "time":2199.1581326465957
       },
       {
-        "dT/dD":12.767144008283758,
         "phase_name":"SS",
-        "take-off angle":23.454386812440546,
         "time":2222.589822007224
       },
       {
-        "dT/dD":1.9222659759508847,
         "phase_name":"PKIKPPKIKP",
-        "take-off angle":5.7654215719944482,
         "time":2259.5987753741283
       }
     ],

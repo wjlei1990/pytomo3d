@@ -112,7 +112,7 @@ def calculate_adjsrc_on_stream(observed, synthetic, windows, config,
 
     adjsrcs_list = []
 
-    for chan_win in windows.itervalues():
+    for chan_win in windows.values():
         if len(chan_win) == 0:
             continue
 
@@ -120,8 +120,9 @@ def calculate_adjsrc_on_stream(observed, synthetic, windows, config,
 
         try:
             obs = observed.select(id=obsd_id)[0]
-        except:
-            raise ValueError("Missing observed trace for window: %s" % obsd_id)
+        except Exception as exp:
+            raise ValueError("Missing observed trace {} for window"
+                             "due to {}".format(obsd_id, exp))
 
         if synt_id == "UNKNOWN":
             syn = synthetic.select(channel="*%s" % obs.stats.channel[-1])[0]
@@ -152,7 +153,7 @@ def calculate_and_process_adjsrc_on_stream(
     # check total number of windows. If total number of
     # window is 0, return None
     nwin_total = 0
-    for value in windows.itervalues():
+    for value in windows.values():
         nwin_total += len(value)
     if nwin_total == 0:
         return
@@ -169,8 +170,13 @@ def calculate_and_process_adjsrc_on_stream(
 
     origin = event.preferred_origin() or event.origins[0]
     focal = event.preferred_focal_mechanism()
+    # quakeml stores the event duration. To get the half duration,
+    # divide it by 2
     hdr = focal.moment_tensor.source_time_function.duration / 2.0
-    # according to SPECFEM starttime convention
+    # according to SPECFEM starttime convention, the trace
+    # start time is -1.5 * hdr + CMT origin start time
+    # Please note if the convention in SPECFEM_GLOBE changes,
+    # the value(1.5) also needs to be changed.
     time_offset = -1.5 * hdr
     starttime = origin.time + time_offset
 
@@ -194,7 +200,7 @@ def measure_adjoint_on_stream(
     """
 
     nwin_total = 0
-    for value in windows.itervalues():
+    for value in windows.values():
         nwin_total += len(value)
     if nwin_total == 0:
         return

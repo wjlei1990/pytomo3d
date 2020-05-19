@@ -127,8 +127,8 @@ class CMTSource(object):
         Initizliaze a source object from a quakeml file
         :param filename: path to a quakeml file
         """
-        from obspy import readEvents
-        cat = readEvents(filename)
+        from obspy import read_events
+        cat = read_events(filename)
         event = cat[0]
         cmtsolution = event.preferred_origin()
         pdesolution = event.origins[0]

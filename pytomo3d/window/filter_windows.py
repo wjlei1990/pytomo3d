@@ -38,8 +38,8 @@ def count_windows(windows):
     nchans = 0
     nwins = 0
     nwins_comp = {}
-    for stainfo in windows.itervalues():
-        for chan, chaninfo in stainfo.iteritems():
+    for stainfo in windows.values():
+        for chan, chaninfo in stainfo.items():
             comp = chan.split(".")[-1][-1]
             _nw = len(chaninfo)
             if _nw == 0:
@@ -91,9 +91,9 @@ def filter_windows_on_sensors(windows, stations, sensor_types, verbose=False):
 
     total_chans = 0
     total_wins = 0
-    for sta, sta_info in windows.iteritems():
+    for sta, sta_info in windows.items():
         sta_wins = {}
-        for chan, chan_info in sta_info.iteritems():
+        for chan, chan_info in sta_info.items():
             pick_flag = False
             if len(chan_info) == 0:
                 # if number of windows is 0
@@ -104,7 +104,8 @@ def filter_windows_on_sensors(windows, stations, sensor_types, verbose=False):
                 # just use Z component instrument information
                 zchan = chan[:-1] + "Z"
                 _st = stations[zchan]["sensor"]
-            except:
+            except Exception as exp:
+                print("Exception raised: {}".format(exp))
                 continue
             if is_right_sensor(_st, sensor_types):
                 sta_wins[chan] = chan_info
@@ -129,8 +130,8 @@ def get_measurements_std(measurements):
     comp_dt_meas = {}
     comp_dlna_meas = {}
 
-    for sta_info in measurements.itervalues():
-        for chan, chan_info in sta_info.iteritems():
+    for sta_info in measurements.values():
+        for chan, chan_info in sta_info.items():
             comp = chan.split(".")[-1][-1]
 
             dts = [v["dt"] for v in chan_info]
@@ -144,11 +145,11 @@ def get_measurements_std(measurements):
                 comp_dlna_meas[comp] = []
             comp_dlna_meas[comp].extend(dlnas)
 
-    dt_means = dict((k, np.mean(v)) for (k, v) in comp_dt_meas.iteritems())
-    dt_stds = dict((k, np.std(v)) for (k, v) in comp_dt_meas.iteritems())
+    dt_means = dict((k, np.mean(v)) for (k, v) in comp_dt_meas.items())
+    dt_stds = dict((k, np.std(v)) for (k, v) in comp_dt_meas.items())
 
-    dlna_means = dict((k, np.mean(v)) for (k, v) in comp_dlna_meas.iteritems())
-    dlna_stds = dict((k, np.std(v)) for (k, v) in comp_dlna_meas.iteritems())
+    dlna_means = dict((k, np.mean(v)) for (k, v) in comp_dlna_meas.items())
+    dlna_stds = dict((k, np.std(v)) for (k, v) in comp_dlna_meas.items())
 
     print("means of dt measurements:")
     pprint(dt_means)
@@ -208,10 +209,10 @@ def filter_measurements_on_bounds(windows, measurements, bounds,
 
     new_wins = {}
     new_meas = {}
-    for sta, sta_info in windows.iteritems():
+    for sta, sta_info in windows.items():
         new_sta_wins = {}
         new_sta_meas = {}
-        for chan, chan_info in sta_info.iteritems():
+        for chan, chan_info in sta_info.items():
             if len(chan_info) == 0:
                 continue
             comp = chan.split(".")[-1][-1]
@@ -358,8 +359,8 @@ def filter_windows_on_measurements(windows, measurements, measure_config):
 
 
 def check_consistency(windows, measurements):
-    for sta, stainfo in windows.iteritems():
-        for chan, chan_info in stainfo.iteritems():
+    for sta, stainfo in windows.items():
+        for chan, chan_info in stainfo.items():
             nwins_chan = len(chan_info)
             if nwins_chan == 0:
                 continue

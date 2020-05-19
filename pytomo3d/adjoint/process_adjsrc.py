@@ -128,7 +128,7 @@ def convert_stream_to_adjs(stream, meta_info):
     """
     adjsrcs = []
 
-    _key = meta_info.keys()[0]
+    _key = list(meta_info.keys())[0]
     _default_meta = meta_info[_key].copy()
     _default_meta["misfit"] = 0.0
     for _tr in stream:
@@ -210,8 +210,8 @@ def sum_adjoint_with_weighting(adj_stream, meta_info, weight_dict):
     new_meta = {}
     done_comps = []
     # sum using components weight
-    for comp, comp_weights in weight_dict.iteritems():
-        for chan_id, chan_weight in comp_weights.iteritems():
+    for comp, comp_weights in weight_dict.items():
+        for chan_id, chan_weight in comp_weights.items():
             if comp not in done_comps:
                 done_comps.append(comp)
                 adj_tr = adj_stream.select(id=chan_id)[0]

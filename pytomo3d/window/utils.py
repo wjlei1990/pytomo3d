@@ -14,7 +14,7 @@ def sort_windows_on_channel_and_location(sta_win):
     :return:
     """
     sort_dict = {}
-    for trace_id, trace_win in sta_win.iteritems():
+    for trace_id, trace_win in sta_win.items():
         chan = trace_id.split('.')[-1][0:2]
         loc = trace_id.split('.')[-2]
         if chan not in sort_dict:
@@ -25,8 +25,8 @@ def sort_windows_on_channel_and_location(sta_win):
         sort_dict[chan][loc]["nwins"] += len(trace_win)
 
     # sort to trace names in order
-    for chan, chan_info in sort_dict.iteritems():
-        for loc, loc_info in chan_info.iteritems():
+    for chan, chan_info in sort_dict.items():
+        for loc, loc_info in chan_info.items():
             loc_info['traces'] = sorted(loc_info['traces'])
 
     return sort_dict
@@ -34,7 +34,7 @@ def sort_windows_on_channel_and_location(sta_win):
 
 def pick_location_with_more_windows(sort_dict):
     choosen = {}
-    for chan, chan_info in sort_dict.iteritems():
+    for chan, chan_info in sort_dict.items():
         if len(chan_info.keys()) == 0:
             continue
 
@@ -42,7 +42,7 @@ def pick_location_with_more_windows(sort_dict):
         # one with most number of windows
         _locs = []
         _nwins = []
-        for loc, loc_info in chan_info.iteritems():
+        for loc, loc_info in chan_info.items():
             _locs.append(loc)
             _nwins.append(loc_info["nwins"])
         _max_idx = np.array(_nwins).argmax()
@@ -66,7 +66,7 @@ def merge_instruments_window(sta_win):
     choosen_locs = pick_location_with_more_windows(sort_dict)
 
     choosen_wins = {}
-    for chan, loc in choosen_locs.iteritems():
+    for chan, loc in choosen_locs.items():
         trace_list = sort_dict[chan][loc]["traces"]
         for tr_id in trace_list:
             choosen_wins[tr_id] = sta_win[tr_id]
@@ -82,7 +82,7 @@ def sort_windows_on_channel(sta_win):
     :return:
     """
     sort_dict = {}
-    for trace_id, trace_win in sta_win.iteritems():
+    for trace_id, trace_win in sta_win.items():
         chan = trace_id.split(".")[-1][0:2]
         if chan not in sort_dict:
             sort_dict[chan] = {"traces": [], "nwins": 0}
@@ -95,7 +95,7 @@ def sort_windows_on_channel(sta_win):
 def pick_channel_with_more_windows(sort_dict):
     max_wins = -1
     max_chan = None
-    for chan, chaninfo in sort_dict.iteritems():
+    for chan, chaninfo in sort_dict.items():
         if chaninfo["nwins"] > max_wins:
             max_wins = chaninfo["nwins"]
             max_chan = chan
@@ -148,7 +148,7 @@ def merge_windows(windows):
     Merge the windows(from one event, multiple stations)
     """
     new_windows = {}
-    for sta, sta_info in windows.iteritems():
+    for sta, sta_info in windows.items():
         if sta_info is None:
             continue
         # merge the windows for each station
@@ -160,12 +160,12 @@ def generate_log_content(windows):
     overall_log = {"stations": 0, "stations_with_windows": 0,
                    "windows": 0, "traces": 0, "traces_with_windows": 0}
     comp_log = {}
-    for sta_name, sta_win in windows.iteritems():
+    for sta_name, sta_win in windows.items():
         if sta_win is None:
             continue
         nwin_sta = 0
         ntraces_with_windows = 0
-        for trace_id, trace_win in sta_win.iteritems():
+        for trace_id, trace_win in sta_win.items():
             comp = trace_id.split(".")[-1]
             if comp not in comp_log:
                 comp_log[comp] = {
@@ -202,3 +202,5 @@ def stats_all_windows(windows, obsd_tag, synt_tag,
 
     print("Windows statistic log file: %s" % output_file)
     dump_json(log, output_file)
+
+    return log

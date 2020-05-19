@@ -44,9 +44,8 @@ def test_flake8():
             full_path = os.path.join(dirpath, py_file)
             files.append(full_path)
 
-    style_guide = flake8.get_style_guide(ignore=['E24', 'W503', 'E226'])
+    style_guide = flake8.get_style_guide()
     report = style_guide.check_files(files)
-    assert report.get_statistics('E') == [], 'Flake8 found violations'
     assert report.total_errors == 0
 
 

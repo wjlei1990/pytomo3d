@@ -24,7 +24,7 @@ def load_window_config_yaml(filename):
     :return:
     """
     with open(filename) as fh:
-        data = yaml.load(fh)
+        data = yaml.load(fh, Loader=yaml.FullLoader)
 
     if data["min_period"] > data["max_period"]:
         raise ValueError("min_period is larger than max_period in config "
@@ -54,7 +54,7 @@ def write_txtfile(windows, filename):
                         win.cc_shift, win.dlnA, win.max_cc_value))
 
 
-def get_json_content(window, simple_mode=True):
+def get_json_content(window, with_phase=False):
     """
     Extract information from json to a dict
 
@@ -81,11 +81,21 @@ def get_json_content(window, simple_mode=True):
         "relative_endtime": window.relative_endtime,
         "window_weight": window.weight}
 
-    if not simple_mode:
+    if with_phase:
         info["phase_arrivals"] = window.phase_arrivals
 
-    if "channel_id_2" in dir(window):
-        info["channel_id_2"] = window.channel_id_2
+    keys = ["channel_id_2",
+            "distance_in_deg", "distance_in_km",
+            "snr_amplitude", "snr_amplitude_threshold",
+            "snr_energy", "snr_energy_threshold"]
+    for k in keys:
+        if k in window.__dict__:
+            info[k] = window.__dict__[k]
+
+    #if "channel_id_2" in dir(window):
+    #    info["channel_id_2"] = window.channel_id_2
+    #if "distance_in_km" in dir(window):
+    #    info["distance_in_km"] = window.distance_in_km
 
     return info
 

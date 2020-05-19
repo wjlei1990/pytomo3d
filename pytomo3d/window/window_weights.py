@@ -33,7 +33,7 @@ def _receiver_validator(weights, rec_wcounts, cat_wcounts):
     :return:
     """
     wsum = 0
-    for chan, chan_weight in weights.iteritems():
+    for chan, chan_weight in weights.items():
         nwin = rec_wcounts[chan]
         wsum += chan_weight * nwin
 
@@ -53,8 +53,8 @@ def calculate_receiver_window_counts(windows):
     """
     rec_wcounts = defaultdict(dict)
     cat_wcounts = defaultdict(lambda: 0)
-    for sta, sta_window in windows.iteritems():
-        for chan, chan_win in sta_window.iteritems():
+    for sta, sta_window in windows.items():
+        for chan, chan_win in sta_window.items():
             comp = chan.split(".")[-1]
             nwin = len(chan_win)
             if nwin == 0:
@@ -187,7 +187,7 @@ def determine_receiver_weighting(
     # in each components, calculate weight
     ref_dists = {}
     cond_nums = {}
-    for comp, comp_info in rec_wcounts.iteritems():
+    for comp, comp_info in rec_wcounts.items():
         print("-" * 10 + "\nComponent: %s" % comp)
         points = assign_receiver_to_points(comp_info, stations)
         print("Number of receivers: %d" % len(points))
@@ -275,7 +275,7 @@ def _category_validator(weights, wcounts):
     """
     wsum = 0.0
     nwins_total = 0
-    for p, pinfo in weights.iteritems():
+    for p, pinfo in weights.items():
         for c in pinfo:
             wsum += weights[p][c] * wcounts[p][c]
             nwins_total += wcounts[p][c]
@@ -295,7 +295,7 @@ def normalize_category_weights(category_ratio, cat_wcounts):
     pprint(cat_wcounts)
     sumv = 0
     nwins_total = 0
-    for p, pinfo in cat_wcounts.iteritems():
+    for p, pinfo in cat_wcounts.items():
         for c in pinfo:
             sumv += cat_wcounts[p][c] * category_ratio[p][c]
             nwins_total += cat_wcounts[p][c]
@@ -306,7 +306,7 @@ def normalize_category_weights(category_ratio, cat_wcounts):
         normc = nwins_total / sumv
 
     weights = {}
-    for p, pinfo in cat_wcounts.iteritems():
+    for p, pinfo in cat_wcounts.items():
         weights[p] = {}
         for c in pinfo:
             weights[p][c] = normc * category_ratio[p][c]
@@ -322,7 +322,7 @@ def check_category_ratio_consistency(cat_weight_ratio, cat_wcounts):
     """
     err = 0
     # check consistency
-    for p, pinfo in cat_weight_ratio.iteritems():
+    for p, pinfo in cat_weight_ratio.items():
         for c in pinfo:
             try:
                 cat_wcounts[p][c]
@@ -372,9 +372,9 @@ def combine_receiver_and_category_weights(rec_weights, cat_weights):
     """
     # combine weights
     weights = {}
-    for period, period_info in rec_weights.iteritems():
+    for period, period_info in rec_weights.items():
         weights[period] = {}
-        for comp, comp_info in period_info.iteritems():
+        for comp, comp_info in period_info.items():
             for chan_id in comp_info:
                 rec_weight = comp_info[chan_id]
                 cat_weight = cat_weights[period][comp]

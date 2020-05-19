@@ -19,10 +19,10 @@ from obspy import read_inventory
 
 def safe_load_staxml(staxmlfile):
     try:
-        inv = read_inventory(staxmlfile)
+        inv = read_inventory(staxmlfile, format="STATIONXML")
     except Exception as exp:
-        raise("Failed to parse staxml file(%s) due to: %s"
-              % (staxmlfile, exp))
+        raise ValueError("Invalid staxml file({}) due to: "
+                         "{}".format(staxmlfile, exp))
     return inv
 
 

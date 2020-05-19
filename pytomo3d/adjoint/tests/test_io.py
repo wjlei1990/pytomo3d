@@ -1,7 +1,6 @@
 import os
 import inspect
 import pytomo3d.adjoint.io as adj_io
-import pytest
 import pyadjoint
 
 
@@ -38,7 +37,6 @@ winfile = os.path.join(DATA_DIR, "window", "IU.KBL..BHR.window.json")
 #    return adj_utils.load_adjoint_config_yaml(config_file)
 
 
-@pytest.fixture
 def load_config_multitaper():
     config_file = os.path.join(DATA_DIR, "adjoint",
                                "multitaper.adjoint.config.yaml")

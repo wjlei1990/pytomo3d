@@ -102,7 +102,11 @@ def test_sort_windows_on_channel():
         'EH': {'nwins': 14, 'traces': ['II.AAK..EHR', 'II.AAK.10.EHZ',
                                        'II.AAK..EHZ']},
         'LH': {'nwins': 4, 'traces': ['II.AAK..LHZ']}}
-    assert sort_dict == _true
+    for comp in sort_dict:
+        d1 = sort_dict[comp]
+        d2 = _true[comp]
+        assert d1["nwins"] == d2["nwins"]
+        assert set(d1["traces"]) == set(d2["traces"])
 
 
 def test_sort_windows_on_channel_2():
